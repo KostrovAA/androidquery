@@ -99,6 +99,7 @@ import com.androidquery.AQuery;
 import com.androidquery.auth.AccountHandle;
 import com.androidquery.auth.GoogleHandle;
 import com.androidquery.util.AQUtility;
+import com.androidquery.util.AQUtility.IProgress;
 import com.androidquery.util.Common;
 import com.androidquery.util.Constants;
 import com.androidquery.util.PredefinedBAOS;
@@ -109,7 +110,7 @@ import com.androidquery.util.XmlDom;
  * The core class of ajax callback handler.
  *
  */
-public abstract class AbstractAjaxCallback<T, K> implements Runnable{
+public abstract class AbstractAjaxCallback<T, K> implements Runnable, IProgress{
 	
 	private static int NET_TIMEOUT = 30000;
 	private static String AGENT = null;
@@ -2143,7 +2144,7 @@ public abstract class AbstractAjaxCallback<T, K> implements Runnable{
 	}
 	
 	
-	private static void writeObject(DataOutputStream dos, String name, Object obj) throws IOException{
+	private void writeObject(DataOutputStream dos, String name, Object obj) throws IOException{
 		
 		if(obj == null) return;
 		
@@ -2163,7 +2164,7 @@ public abstract class AbstractAjaxCallback<T, K> implements Runnable{
 	}
 
 	
-	private static void writeData(DataOutputStream dos, String name, String filename, InputStream is) throws IOException {
+	private void writeData(DataOutputStream dos, String name, String filename, InputStream is) throws IOException {
 		
 		dos.writeBytes(twoHyphens + boundary + lineEnd);
 		dos.writeBytes("Content-Disposition: form-data; name=\""+name+"\";"
@@ -2178,9 +2179,14 @@ public abstract class AbstractAjaxCallback<T, K> implements Runnable{
 		
 		dos.writeBytes(lineEnd);
 
-		AQUtility.copy(is, dos);
+		AQUtility.copy(is, dos, this);
 		
 		dos.writeBytes(lineEnd);
+		
+	}
+	
+	@Override
+	public void increment(int read) {
 		
 	}
 	

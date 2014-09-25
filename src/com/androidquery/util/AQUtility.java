@@ -419,8 +419,33 @@ public class AQUtility {
         
         if(progress != null){
         	progress.done();
+        }	
+    }
+    
+    public interface IProgress {
+    	public void increment(int read);
+    }
+    
+    
+    public static void copy(InputStream in, OutputStream out, IProgress ip) throws IOException {
+    	byte[] b = new byte[IO_BUFFER_SIZE];
+        int read;
+        int count = 0;
+        
+        while((read = in.read(b)) != -1){
+            out.write(b, 0, read);
+            
+            count++;
+            
+            if(TEST_IO_EXCEPTION && count > 2){
+                AQUtility.debug("simulating internet error");
+                throw new IOException();
+            }
+            
+            if(ip != null){
+            	ip.increment(read);
+            }
         }
-    	
     }
     
     public static byte[] toBytes(InputStream is){
